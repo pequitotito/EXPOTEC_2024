@@ -80,23 +80,9 @@ def jogar():
         print("")
         sleep(0.5)
 
-
-
-
     jogadores = [jogador, 1, 2, 3, 4]
-    selecionar_papeis(jogadores)
-    aux = selecionar_papeis(jogadores)
+    print(selecionar_papeis(jogadores))
 
-    if aux[jogador] == "m":
-        papel = "Mafioso"
-    if aux[jogador] == "x":
-        papel = "Xerife"
-    if aux[jogador] == "d":
-        papel = "Doutor"
-    if aux[jogador] == "c":
-        papel = "Cidadão"
-
-    print(f"{jogador}, você é um {papel}.")
 
 
 
