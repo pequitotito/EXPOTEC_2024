@@ -1,2 +1,2 @@
 # Mafia
-Projeto do jogo Máfia (Cidade Dorme) em Python para a EXPOTEC.
+Projeto do jogo Máfia em Python para a EXPOTEC.
