@@ -191,7 +191,7 @@ def xerife():
                 if 0 < acusado < len(jogadores) and jogadores[acusado].vida == 1:
                     if jogadores[acusado].funcao == "mafioso":
                         print(f"O {jogadores[acusado].player} é o assassino!!!")
-                        print("Converse com os outros moradores da Cidade para o eliminar!")
+                        print("Converse com os outros moradores da Cidade para tentar eliminá-lo!")
                         acusacao = True
                     else:
                         print(f"O {jogadores[acusado].player} não é o assassino... Ele ainda está a solta. ")
