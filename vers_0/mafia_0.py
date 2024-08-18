@@ -66,6 +66,8 @@ MMMM                     MMMM     MMMM                      MMMM    MMMM        
     jogador = input("Digite seu nome antes de começarmos: ").strip().title()
     sleep(0.25)
     
+    # INSERIR EXPLICAÇÃO SOBRE O JOGO
+
     jogadores_vivos = 5
 
     # Define as funções disponíveis
@@ -127,6 +129,9 @@ MMMM                     MMMM     MMMM                      MMMM    MMMM        
             print(random.choice(frases_morte))
             jogadores_vivos -= 1
 
+        xerife_investiga = xerife()
+        if jogadores[0].funcao == "xerife" and jogadores[0].vida == 1:
+            print(xerife_investiga)
 
 
         # Jogadores vivos
@@ -136,7 +141,7 @@ MMMM                     MMMM     MMMM                      MMMM    MMMM        
         print("")
         print("Jogadores vivos:", lista_jogadores_vivos)
 
-        
+        rodada += 1
         
 
 
@@ -171,6 +176,42 @@ def matar():
                 jogadores[alvo].morte(True) # Alvo sinalizado como morto
     
     return alvo # Retorna o jogador que morreu
+
+def xerife():
+    global jogadores
+    acusacao = False
+
+    if jogadores[0].funcao == "xerife":
+
+        while acusacao == False:
+
+            try:
+                acusado = int(input("Digite o número do jogador que você deseja investigar se é o assassino ou não: "))
+
+                if 0 < acusado < len(jogadores) and jogadores[acusado].vida == 1:
+                    if jogadores[acusado].funcao == "mafioso":
+                        print(f"O {jogadores[acusado].player} é o assassino!!!")
+                        print("Converse com os outros moradores da Cidade para o eliminar!")
+                        acusacao = True
+                    else:
+                        print(f"O {jogadores[acusado].player} não é o assassino... Ele ainda está a solta. ")
+
+                elif jogadores[acusado].vida == 0:
+                    print(f"O {jogadores[acusado].player} já está morto!! Investigue outro jogador.")
+
+                else:
+                    print(f"Jogador inválido. Tome cuidado com a investigação, Xerife {jogadores[0].player}.")
+
+            except:
+                print("Inválido, tente novamente.")
+
+    else:
+        while acusacao == False:
+            acusado = random.randint(0, 4)
+            if jogadores[acusado].funcao == "mafioso" and jogadores[acusado].vida == 1:
+                print("")
+                acusacao = True
+                
 
 jogar()
 
