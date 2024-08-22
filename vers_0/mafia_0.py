@@ -94,7 +94,7 @@ MMMM                     MMMM     MMMM                      MMMM    MMMM        
 
     rodada = 1
 
-    while jogadores_vivos > 3:
+    while jogadores_vivos > 2:
 
         lista_jogadores_vivos = []
 
@@ -102,6 +102,8 @@ MMMM                     MMMM     MMMM                      MMMM    MMMM        
         print("")
         print(":: RODADA ", rodada, "::")
         print("")
+
+        # O mafioso mata alguém durante a noite, o qual será guardado nessa variável
         morto = matar()
 
         # Se o morto for o usuário
@@ -112,11 +114,13 @@ MMMM                     MMMM     MMMM                      MMMM    MMMM        
 
             sleep(1)
             print(f"\n{jogadores[0].player}, você morreu!! 😞😞")
+            sleep(0.5)
             saida = input("Deseja continuar assistindo o jogo? (Responda com Sim ou Não): ").strip().title()
             try:
                 if (saida == "Nao") or (saida == "N") or (saida == "Não") or (saida == "Ñ"):
                     break
                 else:
+                    sleep(0.25)
                     print("Continuando como telespectador... \n")
             except:
                 print("Resposta inválida.")
@@ -128,10 +132,11 @@ MMMM                     MMMM     MMMM                      MMMM    MMMM        
             frases_morte = [f"Nesta última madrugada, o Jogador {morto} foi assassinado no local de trabalho.", f"Na noite passada, o Jogador {morto} foi encontrado morto dentro de sua casa.", f"Nesta noite, o assassino matou o Jogador {morto}"]
             print(random.choice(frases_morte))
             jogadores_vivos -= 1
+            xerife_investiga = xerife()
+            if jogadores[0].funcao == "xerife" and jogadores[0].vida == 1:
+                print(xerife_investiga)
 
-        xerife_investiga = xerife()
-        if jogadores[0].funcao == "xerife" and jogadores[0].vida == 1:
-            print(xerife_investiga)
+            
 
 
         # Jogadores vivos
@@ -139,6 +144,7 @@ MMMM                     MMMM     MMMM                      MMMM    MMMM        
             if jogadores[i].vida == 1:
                 lista_jogadores_vivos.append(jogadores[i].player)
         print("")
+        sleep(1)
         print("Jogadores vivos:", lista_jogadores_vivos)
 
         rodada += 1
@@ -177,6 +183,13 @@ def matar():
     
     return alvo # Retorna o jogador que morreu
 
+
+
+def medico(): # Essa função será feita na outra versão do projeto. O médico trabalhará após o mafioso para tentar salvar alguém ou a si mesmo durante a noite.
+    pass      # Caso o escolhido do médico seja quem o mafioso escolheu, essa pessoa revive e ninguém é morta durante a noite.
+
+
+
 def xerife():
     global jogadores
     acusacao = False
@@ -186,32 +199,41 @@ def xerife():
         while acusacao == False:
 
             try:
+                sleep(1)
                 acusado = int(input("Digite o número do jogador que você deseja investigar se é o assassino ou não: "))
 
                 if 0 < acusado < len(jogadores) and jogadores[acusado].vida == 1:
                     if jogadores[acusado].funcao == "mafioso":
+                        sleep(0.5)
                         print(f"O {jogadores[acusado].player} é o assassino!!!")
-                        print("Converse com os outros moradores da Cidade para tentar eliminá-lo!")
+                        sleep(0.5)
+                        print("Converse com os outros moradores da Cidade para o eliminar!")
                         acusacao = True
+
                     else:
+                        sleep(0.5)
                         print(f"O {jogadores[acusado].player} não é o assassino... Ele ainda está a solta. ")
+                        acusacao = True
 
                 elif jogadores[acusado].vida == 0:
+                    sleep(0.5)
                     print(f"O {jogadores[acusado].player} já está morto!! Investigue outro jogador.")
 
                 else:
+                    sleep(0.5)
                     print(f"Jogador inválido. Tome cuidado com a investigação, Xerife {jogadores[0].player}.")
 
             except:
+                sleep(0.25)
                 print("Inválido, tente novamente.")
-
-    else:
-        while acusacao == False:
-            acusado = random.randint(0, 4)
-            if jogadores[acusado].funcao == "mafioso" and jogadores[acusado].vida == 1:
-                print("")
-                acusacao = True
                 
+
+
+def debate(jogadores_vivos):
+    global jogadores
+    
+
+
 
 jogar()
 
