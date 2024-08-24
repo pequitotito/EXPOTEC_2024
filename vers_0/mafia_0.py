@@ -120,10 +120,10 @@ MMMM                     MMMM     MMMM                      MMMM    MMMM        
             sleep(0.5)
             saida = input("Deseja continuar assistindo o jogo? (Responda com Sim ou Não): ").strip().title()
             try:
-                if (saida == "Nao") or (saida == "N") or (saida == "Não") or (saida == "Ñ"):
+                if saida in ["Nao", "N", "Não", "Ñ"]:
                     sleep(0.25)
                     print("Obrigado por jogar!")
-                    break
+                    return
                 else:
                     sleep(0.25)
                     print("Continuando como telespectador... \n")
@@ -152,17 +152,20 @@ MMMM                     MMMM     MMMM                      MMMM    MMMM        
         print("Jogadores vivos:", lista_jogadores_vivos)
 
 
+
         # Debate entre os jogadores para acusar o mafioso
         sleep(0.5)
         print("Agora a cidade irá debater para achar o mafioso!")
         sleep(0.5)
 
         acusado = False
+        suspeito = random.randint(1, len(lista_jogadores_vivos) - 1)
+        suspeito_usuario = random.randint(1, len(lista_jogadores_vivos) - 1)
 
         while acusado == False:
 
             if jogadores[0].vida == 0: # Caso o usuário esteja morto, a votação ocorre de maneira aleatória entre os NPCs
-                suspeito = random.randint(1, len(lista_jogadores_vivos))
+                # suspeito = random.randint(1, len(lista_jogadores_vivos) -1)
                 if jogadores[suspeito].vida == 1:
                     print(f"Os jogadores decidiram acusar o {jogadores[suspeito].usuario}!")
                     acusado = True
@@ -170,74 +173,77 @@ MMMM                     MMMM     MMMM                      MMMM    MMMM        
 
             elif jogadores[0].vida == 1: # Caso o usuário esteja vivo, ele irá acusar alguém.
                 sleep(0.5)
-                suspeito_usuario = int(input("Digite o número do jogador que você deseja acusar:"))
+                # suspeito_usuario = -1 # Inicializando a var
 
                 try: # Tratamento de erro caso o acusado seja inválido.
+                    suspeito_usuario = int(input("Digite o número do jogador que você deseja acusar:"))
                     
-                    if suspeito_usuario > 0 and suspeito_usuario < len(jogadores):
+                    if 0 < suspeito_usuario < len(jogadores) and jogadores[suspeito_usuario].vida == 1:
                         sleep(0.5)
                         print(f"Você acusou o {jogadores[suspeito_usuario].usuario}. Vamos ver se os outros jogadores concordam com você.")
                         acusado = True
                     
-                    elif jogadores[suspeito_usuario].vida == 0:
-                        sleep(0.5)
-                        print(f"O {jogadores[acusado].player} está morto! Acuse com atenção, você pode estar matando alguém inocente.")
-                    
                     else:
                         sleep(0.5)
-                        print("Jogador inválido. Atenção na hora de acusar alguém!")
+                        print(f"O {jogadores[suspeito_usuario].usuario} está morto! Acuse outro jogador.")
+                    
 
-                except:
+                except ValueError:
                     sleep(0.25)
                     print("Inválido, tente novamente.")
+                
 
+            if acusado:
 
-            npc_concordam_usuario = random.randint(1, 2) # 1 para SIM, CONCORDAM e 2 para NÃO CONCORDAM na decisão do acusado do usuário
-        
-
-            if npc_concordam_usuario == 1:
-                    
-                sleep(3)
-                print(f"Os demais jogadores decidiram concordar com você e eliminar o {jogadores[suspeito_usuario].usuario}.")
-                sleep(0.5)
-                    
-                if jogadores[suspeito_usuario].funcao == "mafioso":
-                    # FUNÇÃO DE ACERTOU, MATAR O MAFIOSO, VITÓRIA DA CIDADE
-                    print("Ele erá o mafioso!!!")
-                    sleep(0.5)
-                    resultado("vitoria_cidade")
-                    jogadores[suspeito_usuario].morte(True)
-                    break
-
-                else:
-                    # FUNÇÃO DE ERROU, MATAR O INOCENTE, CONTINUAR O JOGO
-                    print(f"O {jogadores[suspeito_usuario].usuario} era inocente!! O mafioso continua solto por aí!")
-                    jogadores[suspeito_usuario].morte(True)
-                        
-                        
-
-            elif npc_concordam_usuario == 2:
-                # print os usuarios n concordaram com vc e resolveram matar etc
-                sleep(3)
-                print(f"Os demais jogadores não concordaram com você e decidiram eliminar o {jogadores[suspeito].usuario}!")
-                sleep(0.5)
-
-                if jogadores[suspeito].funcao == "mafioso":
-                        # FUNÇÃO DE ACERTOU, MATAR O MAFIOSO, VITÓRIA DA CIDADE
-                    print("Ele erá o mafioso!!!")
-                    sleep(0.5)
-                    resultado("vitoria_cidade")
-                    jogadores[suspeito_usuario].morte(True)
-                    break
-
-                else:
-                    # FUNÇÃO DE ERROU, MATAR O INOCENTE, CONTINUAR O JOGO
-                    print(f"O {jogadores[suspeito_usuario].usuario} era inocente!! O mafioso continua solto por aí!")
-                    jogadores[suspeito_usuario].morte(True)
-                        
-
+                #voto = random.choice(["eliminar", "nao_eliminar"])
+                npc_concordam_usuario = random.randint(1, 2) # 1 para SIM, CONCORDAM e 2 para NÃO CONCORDAM na decisão do acusado do usuário
             
-        
+
+                if npc_concordam_usuario == 1:# and voto == "eliminar":
+                        
+                    sleep(3)
+                    print(f"Os demais jogadores decidiram concordar com você e eliminar o {jogadores[suspeito_usuario].usuario}.")
+                    sleep(0.5)
+                        
+                    if jogadores[suspeito_usuario].funcao == "mafioso":
+                        # FUNÇÃO DE ACERTOU, MATAR O MAFIOSO, VITÓRIA DA CIDADE
+                        print("Ele erá o mafioso!!!")
+                        sleep(0.5)
+                        jogadores[suspeito_usuario].morte(True)
+                        print("A CIDADE VENCEU!!")
+                        #resultado_jogo = "vitoria_cidade"
+                        return
+
+                    else:
+                        # FUNÇÃO DE ERROU, MATAR O INOCENTE, CONTINUAR O JOGO
+                        print(f"O {jogadores[suspeito_usuario].usuario} era inocente!! O mafioso continua solto por aí!")
+                        jogadores[suspeito_usuario].morte(True)
+                            
+                            
+
+                elif npc_concordam_usuario == 2: #and voto == "eliminar":
+                    # print os usuarios n concordaram com vc e resolveram matar etc
+                    sleep(3)
+                    print(f"Os demais jogadores não concordaram com você e decidiram eliminar o {jogadores[suspeito].usuario}!")
+                    sleep(0.5)
+
+                    if jogadores[suspeito].funcao == "mafioso":
+                            # FUNÇÃO DE ACERTOU, MATAR O MAFIOSO, VITÓRIA DA CIDADE
+                        print("Ele erá o mafioso!!!")
+                        sleep(0.5)
+                        #resultado_jogo = "vitoria_cidade"
+                        jogadores[suspeito_usuario].morte(True)
+                        print("A CIDADE VENCEU!!!!")
+                        return
+
+                    else:
+                        # FUNÇÃO DE ERROU, MATAR O INOCENTE, CONTINUAR O JOGO
+                        sleep(2)
+                        print(f"O {jogadores[suspeito_usuario].usuario} era inocente!! O mafioso continua solto por aí!")
+                        jogadores[suspeito_usuario].morte(True)
+                            
+
+
         rodada += 1 # Incrementa a rodada
 
 def matar():
@@ -320,34 +326,7 @@ def xerife():
                 print("Inválido, tente novamente.")
                 
 
-
-def debate(jogadores_vivos):
-    global jogadores
-    acusado_debate = False
-
-
-
-
-def resultado(resultado_final):
-
-    if resultado_final == "vitoria_cidade":
-        return "CIDADE VENCEU! O mafioso tentou, porém não foi o suficiente!"
-    
-    elif resultado_final == "derrota_cidade":
-        return "O MAFIOSO VENCEU! Ninguém conseguiu parar o mafioso com seus truques..."
-
-
-
-# Chama a função principal para iniciar o jogo
-
 jogar()
 
-# Jogadores vivos
-''' for i in range(0, len(jogadores)):
-            if jogadores[i].vida == 1:
-                lista_jogadores_vivos.append(jogadores[i].player)
-        print("")
-        sleep(1)
-        print("Jogadores vivos:", lista_jogadores_vivos)
 
-        rodada += 1'''
+# Teste de melhoria de interface gráfica feita com curses em outra versão do projeto
