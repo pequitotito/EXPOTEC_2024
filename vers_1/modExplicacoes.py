@@ -3,7 +3,7 @@
 from time import sleep
 
 
-def inicio():
+def inicio() -> None:
     print('''
 MMMMMMMMM        MMMMMMMMMMMM              MMMMMMMMMMMM             MMMMMMMMMMMMMMMM    MMMM             MMMMMMMMMMMM                 ⠀⠀⠀⠀⠀⢀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⣀⣀⣀⣤⣤       
 MMMM   MMMM      MMMMM   MMMM             MMMM MMMM MMMM            MMMMMMMMMMMMMMMM    MMMM            MMMM MMMM MMMM                    ⢶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿
@@ -26,7 +26,7 @@ MMMM                     MMMM     MMMM                      MMMM    MMMM        
         sleep(0.25)    
         print("Já que você não precisa de mais explicações... Vamos ao jogo!")
 
-def explicacao():
+def explicacao() -> None:
     sleep(0.25), print("\nHá nesta cidade um terrível assassino... Ele busca assassinar todos os jogadores a sangue frio\n",
                        "e causar discórdia entre os moradores da cidade.")
     
@@ -47,3 +47,4 @@ def explicacao():
     sleep(0.5), print("Caso decidam eliminá-lo e ele não for o assassino... Mais uma noite chega e o assassino irá agir.")
     sleep(0.5), print("Se não decidirem eliminar o jogador, mais uma discussão ocorre até que alguém seja escolhido para morrer.\n")
     sleep(0.5), print("O jogo termina com a vitória da Cidade ou do Mafioso! Boa sorte e bom jogo!!\n")
+    
