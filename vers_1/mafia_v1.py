@@ -1,4 +1,6 @@
 
+
+
 import modExplicacoes
 import random
 from time import sleep
@@ -50,50 +52,23 @@ class Jogo:
         self.vida = 1
 
 
+
 def jogar() -> None: # Função principal que controla o jogo.
     global jogadores
     global jogadores_vivos
     modExplicacoes.inicio() #Dá boas vindas ao user e explicação sobre o jogo
-
-    jogador = input("Digite seu nome antes de começarmos: ").strip().title()
-    sleep(0.25)
-
+    jogador = input("Digite seu nome antes de começarmos: ").strip().title(), sleep(0.25)
     definir_funcoes(jogador)
-
     rodada = 1 # Inicia o contador de rodadas
 
     while jogadores_vivos > 2: # O jogo continua enquanto houver mais de 2 jogadores vivos
-
         lista_jogadores_vivos = []
+        sleep(0.5), print("\n:: RODADA ", rodada, "::\n")
+        morto = matar() # O mafioso mata alguém durante a noite, o qual será guardado nessa variável
 
-        sleep(0.5)
-        print("")
-        print(":: RODADA ", rodada, "::")
-        print("")
-
-        # O mafioso mata alguém durante a noite, o qual será guardado nessa variável
-        morto = matar()
-
-        # Se o morto for o usuário
-        if morto == 0:
-            print(f"Durante a noite, o assassino fez algo terrível... Invadiu a casa de {jogadores[0].player} e cometeu um ato brutal.")
-            sleep(0.5)
-            print(f"Vítima de 23 facadas, {jogadores[0].player} infelizmente não resistiu.")
-
-            sleep(1)
-            print(f"\n{jogadores[0].player}, você morreu!! 😞😞")
-            sleep(0.5)
-            saida = input("Deseja continuar assistindo o jogo? (Responda com Sim ou Não): ").strip().title()
-            try:
-                if (saida == "Nao") or (saida == "N") or (saida == "Não") or (saida == "Ñ"):
-                    sleep(0.25)
-                    print("Obrigado por jogar!")
-                    break
-                else:
-                    sleep(0.25)
-                    print("Continuando como telespectador... \n")
-            except:
-                print("Resposta inválida.")
+        if morto == 0: # Se o morto for o usuário
+            if user_morto(jogadores[0].player):
+                break
 
             jogadores_vivos -= 1
         
@@ -105,7 +80,7 @@ def jogar() -> None: # Função principal que controla o jogo.
 
             xerife_investiga = xerife()  # O xerife realiza uma investigação
             if jogadores[0].funcao == "xerife" and jogadores[0].vida == 1:
-                print(xerife_investiga)
+                xerife()
 
 
         sleep(2)
@@ -130,7 +105,7 @@ def jogar() -> None: # Função principal que controla o jogo.
 
 
 
-def definir_funcoes(jogador: str) -> None:
+def definir_funcoes(jogador: str):
     funcoes = ["d", "x", "m", "c", "c", "c", "c", "c"]
 
     func = random.choice(funcoes)
@@ -188,6 +163,32 @@ def matar() -> int:
     return alvo # Retorna o jogador que morreu
 
 
+
+def user_morto(jogador):
+    global jogadores
+    terminar = False
+    print(f"Durante a noite, o assassino fez algo terrível... Invadiu a casa de {jogadores[0].player} e cometeu um ato brutal.")
+    sleep(0.5)
+    print(f"Vítima de 23 facadas, {jogadores[0].player} infelizmente não resistiu.")
+
+    sleep(1)
+    print(f"\n{jogadores[0].player}, você morreu!! 😞😞")
+    sleep(0.5)
+    saida = input("Deseja continuar assistindo o jogo? (Responda com Sim ou Não): ").strip().title()
+    try:
+        if (saida == "Nao") or (saida == "N") or (saida == "Não") or (saida == "Ñ"):
+            sleep(0.25)
+            print("Obrigado por jogar!")
+            terminar = True
+        else:
+            sleep(0.25)
+            print("Continuando como telespectador... \n")
+    except:
+        print("Resposta inválida.")
+    return terminar
+
+
+    
 
 def medico(vitima: int) -> bool: 
     '''Essa função é para que o médico consiga escolher uma pessoa para proteger por noite. Caso o assassino tente matar o protegido pelo médico,
