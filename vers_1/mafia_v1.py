@@ -8,7 +8,7 @@ jogadores = []
 jogadores_vivos = 8
 
 class Jogo:
-    def __init__(self, usuario, player="", funcao=""):
+    def __init__(self, usuario: int, player="", funcao=""):
         self.funcao = funcao # Função do jogador
         self.vida = 1 # Vida inicial do jogador
         self.player = player # Nome do jogador
@@ -16,7 +16,7 @@ class Jogo:
 
 
     
-    def selecionar_papeis(self, papel):
+    def selecionar_papeis(self, papel: str) -> None:
         # Esta função atribui uma função (mafioso, doutor, xerife, cidadão) ao jogador com base no papel selecionado.
         funcao = ""
         if papel == "m":
@@ -37,7 +37,7 @@ class Jogo:
             print(f"{self.player}, você é um {funcao}! 🤫🤫🤫")
 
     
-    def morte(self, morte):
+    def morte(self, morte: bool) -> bool:
         # Esta função define o estado de vida do jogador como morto (vida = 0) caso ele seja assassinado.
         if morte:
             self.vida = 0
@@ -45,12 +45,12 @@ class Jogo:
                 print("")
                 print(f"{self.player}, nesta madrugada você foi morto!")
 
-    def revive(self):
+    def revive(self) -> None:
         # Essa função é chamada quando o doutor escolher salvar alguém que seria assassinado, logo a pessoa "revive".
         self.vida = 1
 
 
-def jogar(): # Função principal que controla o jogo.
+def jogar() -> None: # Função principal que controla o jogo.
     global jogadores
     global jogadores_vivos
     modExplicacoes.inicio() #Dá boas vindas ao user e explicação sobre o jogo
@@ -130,7 +130,7 @@ def jogar(): # Função principal que controla o jogo.
 
 
 
-def definir_funcoes(jogador):
+def definir_funcoes(jogador: str) -> None:
     funcoes = ["d", "x", "m", "c", "c", "c", "c", "c"]
 
     func = random.choice(funcoes)
@@ -153,7 +153,7 @@ def definir_funcoes(jogador):
 
 
 
-def matar():
+def matar() -> int:
     ''' Essa função é responsável por selecionar e matar um jogador. Caso o usuário for o mafioso, ele escolhe a vítima.
         Caso contrário, a vítima é escolhida aleatoriamente. A função checa se o alvo é válido ou não e também utiliza
         try except para tratar os erros do código (caso o usuário digite uma string invés de um int ou um int fora do 
@@ -189,7 +189,7 @@ def matar():
 
 
 
-def medico(vitima): 
+def medico(vitima: int) -> bool: 
     '''Essa função é para que o médico consiga escolher uma pessoa para proteger por noite. Caso o assassino tente matar o protegido pelo médico,
         esta pessoa não morrerá e 'reviverá' durante a noite.'''
     global jogadores
@@ -223,7 +223,7 @@ def medico(vitima):
     return reviveu
 
 
-def xerife():
+def xerife() -> None:
     '''  Função responsável pela investigação do usuário quando ele for o xerife para tentar descobrir quem é o assassino.
          Caso o jogador descubra quem é o assassino, ele poderá tentar votar o assassino fora com os outros NPCs, que
          aleatoriamente irão concordar ou discordar dele.'''
@@ -257,7 +257,7 @@ def xerife():
                 
 
 
-def acusa(quantidade_vivos):
+def acusa(quantidade_vivos: int) -> list[int, bool]:
     global jogadores
     resultado = False
     ja_acusado = 0
