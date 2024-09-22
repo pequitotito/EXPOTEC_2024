@@ -1,5 +1,7 @@
 
 
+# FALTA ADC A FUNÇÃO DE MÉDICO FUNCIONALMENTE E ARQUIVO DE RANKING
+
 
 import modExplicacoes
 import random
