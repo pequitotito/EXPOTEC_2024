@@ -1,5 +1,5 @@
 
-
+import random
 from time import sleep
 
 
@@ -48,3 +48,35 @@ def explicacao() -> None:
     sleep(0.5), print("Se não decidirem eliminar o jogador, mais uma discussão ocorre até que alguém seja escolhido para morrer.\n")
     sleep(0.5), print("O jogo termina com a vitória da Cidade ou do Mafioso! Boa sorte e bom jogo!!\n")
     
+def mensagem_fim_de_jogo(vitoria: bool):
+    '''Caso seja vitória da Cidade, exibe que foi vitória dos jogadores. Caso seja vitória do mafioso, foi derrota dos jogadores.'''
+    print("\n" + "*" * 50)
+    
+    if vitoria:
+        print("\n" + " " * 10 + "PARABÉNS! VOCÊS VENCERAM!".center(50))
+    else:
+        print("\n" + " " * 10 + "VOCÊS PERDERAM. TENTE NOVAMENTE!".center(50))
+    
+    print("\n" + "*" * 50 + "\n")
+
+
+
+
+def mensagem_de_rodada(rodada: int) -> None:
+    '''Função feita apenas para exibir na tela a mensagem de qual rodada está começando.
+       Feita para dividir a função principal 'jogar' em várias subfunções.'''
+    print("\n" + "=" * 40)
+    print(f"::: Início da Rodada {rodada} :::")
+    print("=" * 40 + "\n")
+
+
+
+
+def mensagem_morte_npc(morto: int) -> None:
+    """Exibe uma mensagem aleatória sobre a morte de um NPC."""
+    frases_morte = [
+        f"Nesta última madrugada, o Jogador {morto} foi assassinado no local de trabalho.",
+        f"Na noite passada, o Jogador {morto} foi encontrado morto dentro de sua casa.",
+        f"Nesta noite, o assassino matou o Jogador {morto}."
+    ]
+    print(random.choice(frases_morte))
