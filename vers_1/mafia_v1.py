@@ -39,13 +39,13 @@ class Jogo:
             print(f"{self.player}, você é um {funcao}! 🤫🤫🤫")
 
     
-    def morte(self, morte: bool) -> bool:
+    def morte(self) -> None:
         # Esta função define o estado de vida do jogador como morto (vida = 0) caso ele seja assassinado.
-        if morte:
-            self.vida = 0
-            if self.usuario == 0:
-                print("")
-                print(f"{self.player}, nesta madrugada você foi morto!")
+        self.vida = 0
+        if self.usuario == 0:
+            print("")
+            print(f"{self.player}, nesta madrugada você foi morto!")
+
 
     def revive(self) -> None:
         # Essa função é chamada quando o doutor escolher salvar alguém que seria assassinado, logo a pessoa "revive".
@@ -56,53 +56,68 @@ class Jogo:
 def jogar() -> None: # Função principal que controla o jogo.
     global jogadores
     global jogadores_vivos
+
     modExplicacoes.inicio() #Dá boas vindas ao user e explicação sobre o jogo
-    jogador = input("Digite seu nome antes de começarmos: ").strip().title(), sleep(0.25)
-    definir_funcoes(jogador)
+    jogador = input("Digite seu nome antes de começarmos: ").strip().title()
+    sleep(0.25)
+    definir_funcoes(jogador) # Define as funções dos jogadores, recebe o jogador para falar o nome dele
+
     rodada = 1 # Inicia o contador de rodadas
 
     while jogadores_vivos > 2: # O jogo continua enquanto houver mais de 2 jogadores vivos
-        lista_jogadores_vivos = []
-        sleep(0.5), print("\n:: RODADA ", rodada, "::\n")
+        sleep(0.5)
+        modExplicacoes.mensagem_de_rodada(rodada)
         morto = matar() # O mafioso mata alguém durante a noite, o qual será guardado nessa variável
 
-        if morto == 0: # Se o morto for o usuário
-            if user_morto(jogadores[0].player):
-                break
-
-            jogadores_vivos -= 1
-        
-        if morto != 0:
-            sleep(1)
-            frases_morte = [f"Nesta última madrugada, o Jogador {morto} foi assassinado no local de trabalho.", f"Na noite passada, o Jogador {morto} foi encontrado morto dentro de sua casa.", f"Nesta noite, o assassino matou o Jogador {morto}"]
-            print(random.choice(frases_morte))
-            jogadores_vivos -= 1
-
-            xerife_investiga = xerife()  # O xerife realiza uma investigação
-            if jogadores[0].funcao == "xerife" and jogadores[0].vida == 1:
-                xerife()
-
-
-        sleep(2)
-        print("Agora os jogadores vão debater para tentar achar o mafioso!")
-        acusacao = acusa(jogadores_vivos)
-        
-        if acusacao[0] == 0:
+        if verificar_morte(morto) == True: # O jogador morreu e deseja encerrar o jogo
             break
 
-        if acusacao[1] != -1:
-            jogadores[acusa[1]].morte(True)
-            sleep(0.5)
-            print(f"O jogador {jogadores[acusa[1]].player} foi acusado e eliminado!")
+        if morto != 0:
+            sleep(1)
+            modExplicacoes.mensagem_morte_npc(morto)
+            jogadores_vivos -= 1
+            investigacao_xerife()
 
-            if acusacao[1] == 0:
-                sleep(0.5)
-                print("Você foi eliminado!")
-                break
-        
+        if debate() == True:
+            break
 
         rodada += 1 # Incrementa a rodada
 
+
+
+def user_morto(jogador):
+    global jogadores
+    terminar = False
+    print(f"Durante a noite, o assassino fez algo terrível... Invadiu a casa de {jogador} e cometeu um ato brutal.")
+    sleep(0.5)
+    print(f"Vítima de 23 facadas, {jogadores[0].player} infelizmente não resistiu.")
+
+    sleep(1)
+    print(f"\n{jogadores[0].player}, você morreu!! 😞😞")
+    sleep(0.5)
+    saida = input("Deseja continuar assistindo o jogo? (Responda com Sim ou Não): ").strip().title()
+    try:
+        if (saida == "Nao") or (saida == "N") or (saida == "Não") or (saida == "Ñ"):
+            sleep(0.25)
+            print("Obrigado por jogar!")
+            terminar = True
+        else:
+            sleep(0.25)
+            print("Continuando como telespectador... \n")
+    except:
+        print("Resposta inválida.")
+    return terminar
+
+
+
+def verificar_morte(morto:int) -> bool:
+    global jogadores_vivos
+    if morto == 0:
+        if user_morto(jogadores[0].player):
+            return True
+        jogadores_vivos -= 1
+    return False
+    
 
 
 def definir_funcoes(jogador: str):
@@ -146,7 +161,10 @@ def matar() -> int:
                 if 0 < alvo < len(jogadores) and jogadores[alvo].vida == 1:
                     print("Alvo Válido.")
                     mata = True
-                    jogadores[alvo].morte(True) # O True aqui simboliza que o alvo estará morto     
+                    jogadores[alvo].morte() # O alvo estará morto 
+                    if jogadores[alvo].vida == 0: 
+                        sleep(1)
+                        print(f"O jogador {alvo} foi assassinado com sucesso.")   
 
                 else:
                         print("Esse jogador já morreu.")
@@ -163,32 +181,28 @@ def matar() -> int:
     return alvo # Retorna o jogador que morreu
 
 
+def debate() -> bool:
+    global jogadores_vivos
+    sleep(2)
+    print("Agora os jogadores vão debater para tentar achar o mafioso!")
+    acusacao = acusa(jogadores_vivos)
 
-def user_morto(jogador):
-    global jogadores
-    terminar = False
-    print(f"Durante a noite, o assassino fez algo terrível... Invadiu a casa de {jogadores[0].player} e cometeu um ato brutal.")
-    sleep(0.5)
-    print(f"Vítima de 23 facadas, {jogadores[0].player} infelizmente não resistiu.")
+    if acusacao[0] == 0:
+        return True
 
-    sleep(1)
-    print(f"\n{jogadores[0].player}, você morreu!! 😞😞")
-    sleep(0.5)
-    saida = input("Deseja continuar assistindo o jogo? (Responda com Sim ou Não): ").strip().title()
-    try:
-        if (saida == "Nao") or (saida == "N") or (saida == "Não") or (saida == "Ñ"):
-            sleep(0.25)
-            print("Obrigado por jogar!")
-            terminar = True
-        else:
-            sleep(0.25)
-            print("Continuando como telespectador... \n")
-    except:
-        print("Resposta inválida.")
-    return terminar
+    if acusacao[1] != -1:
+        jogadores[acusa[1]].morte(True)
+        sleep(0.5)
+        print(f"O jogador {jogadores[acusa[1]].player} foi sentenciado a morte por seus companheiros! Ele foi eliminado.")
+
+        if acusacao[1] == 0:
+            sleep(0.5)
+            print("Você foi eliminado!")
+            return True
+        
+    return False
 
 
-    
 
 def medico(vitima: int) -> bool: 
     '''Essa função é para que o médico consiga escolher uma pessoa para proteger por noite. Caso o assassino tente matar o protegido pelo médico,
@@ -224,6 +238,7 @@ def medico(vitima: int) -> bool:
     return reviveu
 
 
+
 def xerife() -> None:
     '''  Função responsável pela investigação do usuário quando ele for o xerife para tentar descobrir quem é o assassino.
          Caso o jogador descubra quem é o assassino, ele poderá tentar votar o assassino fora com os outros NPCs, que
@@ -257,133 +272,163 @@ def xerife() -> None:
                 print("Inválido, tente novamente.")
                 
 
+def investigacao_xerife() -> None:
+    global jogadores
+    if jogadores[0].funcao == "xerife" and jogadores[0].vida == 1:
+        xerife()
 
-def acusa(quantidade_vivos: int) -> list[int, bool]:
+
+def acusa(quantidade_vivos: int) -> list[int, bool]: 
+    '''Função principal responsável por fazer o debate de acusação entre os 8 jogadores.'''
     global jogadores
     resultado = False
-    ja_acusado = 0
-    players_vivos = []
-
-	
-    for i in range(0, len(jogadores)):
-        if jogadores[i].vida == 1:
-            players_vivos.append(jogadores[i].usuario)
-
+    players_vivos = jogadores_vivos()
 
     if jogadores[0].vida == 0:
         print("\nJogadores vivos:", players_vivos)
-        while not resultado:
-            acusacao = False
-            while not acusacao:
-                escolha = random.randint(1, 4)
-                if escolha < len(jogadores) and jogadores[escolha].vida == 1 and escolha != ja_acusado:
-                    acusacao = True
-                    print("\nOs jogadores decidiram acusar o player", str(escolha) + ".\nHora da votação!")
-
-            voto = random.randint(1, 2)
-
-            if voto == 2 and jogadores[escolha].funcao != "mafioso":
-                sleep(1)
-                print("\nVotação concluída! O jogador acusado foi eliminado.")
-                print("Ele não era o mafioso!")
-                resultado = True
-                quantidade_vivos = quantidade_vivos - 1
-                jogadores[escolha].morte(True)
-
-            elif voto == 1 and jogadores[escolha].funcao == "mafioso":
-                sleep(2)
-                print("\nVotação concluída! O player acusado foi eliminado. \n\nEle era o mafioso!\nA CIDADE VENCEU!")
-                resultado = True
-                quantidade_vivos = 0
-
-            else:
-                sleep(2)
-                print("\nVotação concluída! Após o debate, os jogadores concluíram que o jogador acusado não deve ser eliminado. Logo, outra acusação deverá ser feita.")
-                ja_acusado = escolha
-
-        return [quantidade_vivos, False]
-    
+        resultado, quantidade_vivos = acusacao_npcs(quantidade_vivos)
     else:
-        print("Jogadores vivos: ", players_vivos)
+        print("Jogadores vivos:", players_vivos)
+        resultado, quantidade_vivos = acusacao_jogadores(quantidade_vivos)
+
+    return [quantidade_vivos, resultado]
+
+
+
+
+def jogadores_vivos() -> list[str]:
+    '''Função responsável por retornar uma lista dos players vivos, que será utilizada na função de acusar.'''
+    global jogadores
+    players_vivos = []
+
+    for jogador in jogadores:
+        if jogador.vida == 1:
+            players_vivos.append(jogador.usuario)
+
+    return players_vivos
+
+
+
+def acusacao_npcs(quantidade_vivos: int) -> tuple[bool, int]:
+    '''Função responsável por fazer a acusação dos NPCs, que será utilizada na função de acusar.'''
+    global jogadores
+    resultado = False
+    ja_acusado = 0
 
     while not resultado:
-        usuario_eliminado = False
-        acusacao = False
-        escolha = False
-        
-        while escolha == False:
-            escolha_usuario = int(input("\nDigite o número do player que você quer acusar: "))
+        escolha = escolher_acusacao_npc(ja_acusado)
+        voto = random.randint(1, 2)
+        resultado, quantidade_vivos = votacao_npc(escolha, voto, quantidade_vivos)
 
-            if escolha_usuario <= 0 or escolha_usuario > 8:
-                print("Número inválido.")
-
-            elif jogadores[escolha].vida == 0:
-                print("\nEsse player já está morto. Escolha outro para acusar.")
-            
-            else:
-                escolha = True
-                print("Os jogadores estão decidindo quem eles querem acusar...")
-
-        escolha_jogador = jogadores[escolha_usuario].usuario
-        decisao = random.randint(1, 2)
-
-        if decisao == 1 and escolha_jogador != ja_acusado:
-            print(f"Outros jogadores concordaram com você, e o Jogador {escolha_usuario} está sendo acusado!")
-
-        else:
-            print("\nOs outros jogadores não concordaram com você e acusaram outro player.")
-            
-            while acusacao == False:
-                escolha_usuario = random.randint(0, len(jogadores) - 1)
-                if jogadores[escolha_usuario].vida == 1 and escolha_usuario != ja_acusado and escolha != escolha_jogador:
-                    acusacao = True
-
-                    if escolha == 0:
-                        print("Os outros jogadores decidiram acusar você!!!")
-
-                    else:
-                        print(f"Os outros jogadores decidiram acusar o Jogador {escolha_usuario}.")
-
-        if escolha_usuario == 0:
-            defesa_usuario = input(f"{jogadores[0].player}, você pode tentar se defender para se salvar. Digite sua defesa: ")
-            # a defesa do usuario nao serve para os npcs formarem opiniao, é apenas para o usuario ser uma sensação disso
-
-        else:
-            lista_defesas = ["Eu não fiz nada! Nem estava acordado na última noite.", 
-                             "Estava jogando no meu computador a noite inteira! Vão acusar outra pessoa!", 
-                             "Eu não sei nem o que falar para me defender, mas não fui eu, por favor!",
-                             "Eu dormi cedo na última noite.", 
-                             "Durante a última noite, eu estava saindo com a minha namorada."]
-            print(f"O {jogadores[escolha_usuario].player} vai se defender: \n")
-            print(random.choice(lista_defesas))
-            voto_usuario = input("Você deseja acusá-lo ou não? ") # novamente, apenas para o jogador sentir que está votando
-            sleep(2)
-            print("Contabilizando os votos de todos os jogadores...")
-
-        voto_final = random.randint(0, 1)
-
-        if voto_final == 1 and jogadores[escolha_usuario].funcao != "mafioso":
-            print(f"O {jogadores[escolha_usuario].usuario} não era o mafioso! Boa sorte votando da próxima vez.")
-            resultado = True
-            quantidade_vivos -= 1
-            jogadores[escolha_usuario].morte(True)
-
-        elif voto_final == 1 and jogadores[escolha_usuario].funcao == "mafioso":
-            print(f"O {jogadores[escolha_usuario].usuario} ERA o mafioso!")
-            print("A CIDADE VENCEU!")
-            resultado = True
-            quantidade_vivos = 0
-            jogadores[escolha_usuario].morte(True)
-            return 0, escolha
-        
-        else:
-            print(f"\nVotação concluída! O {jogadores[escolha_usuario].usuario} não foi eliminado!")
+        if not resultado:
             ja_acusado = escolha
-			
-            if voto_final == 1 and escolha == 0:
-                usuario_eliminado = True
-		
-    return [quantidade_vivos, usuario_eliminado]
+
+    return resultado, quantidade_vivos
+
+
+
+def escolher_acusacao_npc(ja_acusado: int) -> int:
+    '''Função responsável por definir quem será o player acusado. Será utilizada na função de acusar.'''
+    global jogadores
+    acusacao = False
+
+    while not acusacao:
+        escolha = random.randint(1, 4)
+
+        if escolha < len(jogadores) and jogadores[escolha].vida == 1 and escolha != ja_acusado:
+            acusacao = True
+            print(f"\nOs jogadores decidiram acusar o player {escolha}. Hora da votação!")
+
+    return escolha
+
+
+
+def votacao_npc(escolha: int, voto: int, quantidade_vivos: int) -> tuple[bool, int]:
+    global jogadores
+    if voto == 2 and jogadores[escolha].funcao != "mafioso":
+        sleep(1)
+        print("\nVotação concluída! O jogador acusado foi eliminado. Ele não era o mafioso!")
+        quantidade_vivos -= 1
+        jogadores[escolha].morte(True)
+        return True, quantidade_vivos
+    elif voto == 1 and jogadores[escolha].funcao == "mafioso":
+        sleep(2)
+        print("\nVotação concluída! O jogador acusado foi eliminado. Ele era o mafioso! A CIDADE VENCEU!")
+        return True, 0
+    else:
+        sleep(2)
+        print("\nVotação concluída! O jogador acusado não deve ser eliminado. Outra acusação será feita.")
+        return False, quantidade_vivos
+
+
+
+def acusacao_jogadores(quantidade_vivos: int) -> tuple[bool, int]:
+    global jogadores
+    resultado = False
+    while not resultado:
+        escolha_usuario = escolher_acusacao_jogador()
+        resultado, quantidade_vivos = votacao_jogador(escolha_usuario, quantidade_vivos)
+    return resultado, quantidade_vivos
+
+
+
+def escolher_acusacao_jogador() -> int:
+    global jogadores
+    escolha = False
+    while not escolha:
+        escolha_usuario = int(input("\nDigite o número do player que você quer acusar: "))
+        if escolha_usuario <= 0 or escolha_usuario > 8:
+            print("Número inválido.")
+        elif jogadores[escolha_usuario].vida == 0:
+            print("\nEsse player já está morto. Escolha outro.")
+        else:
+            escolha = True
+            print("Os jogadores estão decidindo quem eles querem acusar...")
+    return escolha_usuario
+
+
+
+def votacao_jogador(escolha_usuario: int, quantidade_vivos: int) -> tuple[bool, int]:
+    global jogadores
+
+    defesa_usuario = input(f"{jogadores[0].player}, você pode tentar se defender para se salvar. Digite sua defesa: ") 
+
+    if escolha_usuario == 0:
+        print(f"{jogadores[0].player} está tentando se defender!")
+   
+    else:
+        exibir_defesa_jogador(escolha_usuario)
+
+    voto_final = random.randint(0, 1)
+    
+    if voto_final == 1 and jogadores[escolha_usuario].funcao != "mafioso":
+        print(f"O {jogadores[escolha_usuario].usuario} não era o mafioso! Boa sorte na próxima votação.")
+        jogadores[escolha_usuario].morte(True)
+        return True, quantidade_vivos - 1
+    
+    elif voto_final == 1 and jogadores[escolha_usuario].funcao == "mafioso":
+        print(f"O {jogadores[escolha_usuario].usuario} ERA o mafioso! A CIDADE VENCEU!")
+        jogadores[escolha_usuario].morte(True)
+        return True, 0
+    
+    else:
+        print(f"\nVotação concluída! O {jogadores[escolha_usuario].usuario} não foi eliminado.")
+        return False, quantidade_vivos
+
+
+
+def exibir_defesa_jogador(escolha_usuario: int):
+    global jogadores
+    lista_defesas = [
+        "Eu não fiz nada! Nem estava acordado na última noite.",
+        "Estava jogando no meu computador a noite inteira! Vão acusar outra pessoa!",
+        "Eu não sei nem o que falar para me defender, mas não fui eu, por favor!",
+        "Eu dormi cedo na última noite.",
+        "Durante a última noite, eu estava saindo com a minha namorada."
+    ]
+    print(f"O {jogadores[escolha_usuario].player} vai se defender: \n")
+    print(random.choice(lista_defesas))
+
 
 
 
