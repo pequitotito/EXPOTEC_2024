@@ -19,14 +19,14 @@ MMMM                     MMMM     MMMM                      MMMM    MMMM        
     sleep(0.25)
     print("\nBem-vindo ao jogo Máfia! 🕵  🔪 🩸") 
     sleep(0.25)
-    explicacao = input("Gostaria de uma explicação antes de iniciar o jogo?\nResponda com 'Sim' ou 'Não': ").strip().lower()
-    if explicacao in ['s', 'sim']:
-        explicacao()
+    quer_explicacao = input("Gostaria de uma explicação antes de iniciar o jogo?\nResponda com 'Sim' ou 'Não': ").strip().lower()
+    if quer_explicacao in ['s', 'sim']:
+        dar_explicacao()
     else:
         sleep(0.25)    
         print("Já que você não precisa de mais explicações... Vamos ao jogo!")
 
-def explicacao() -> None:
+def dar_explicacao() -> None:
     mensagens = [
         "\nHá nesta cidade um terrível assassino... Ele busca assassinar todos os jogadores a sangue frio\ne causar discórdia entre os moradores da cidade\n",
         "Há um narrador que dará informações durante todo o jogo. Logo no início sçao distribuídos papéis entre os jogadores.\nOs papéis são:\nMafioso\nMédico\nXerife\nCidadão\n\n",
