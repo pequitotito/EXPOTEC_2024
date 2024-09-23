@@ -139,10 +139,6 @@ def definir_funcoes(jogador: str):
         jogadores[npc].selecionar_papeis(func) 
         funcoes.remove(func)
 
-    # Imprime a função de cada jogador -- apenas de teste para checar se o programa está correndo corretamente, na versão final isso deve ser retirado.
-    for j in jogadores:
-        print(f"Jogador {j.usuario}: {j.funcao}")
-
 
 
 def matar() -> int:
@@ -188,12 +184,12 @@ def debate() -> bool:
     if acusacao[1] != -1:
         jogadores[acusacao[1]].morte()
         sleep(0.5)
-        print(f"O jogador {jogadores[acusa[1]].player} foi sentenciado a morte por seus companheiros! Ele foi eliminado.")
+        print(f"O jogador {jogadores[acusacao[1]].player} foi sentenciado a morte por seus companheiros! Ele foi eliminado.")
 
         if acusacao[1] == 0:
             sleep(0.5)
             print("Você foi eliminado!")
-            return True
+            return True # Termina pois o user foi eliminado
         
     return False
 
@@ -284,7 +280,7 @@ def acusa(quantidade_vivos: int) -> list[int, bool]:
     '''Função principal responsável por fazer o debate de acusação entre os 8 jogadores.'''
     global jogadores
     resultado = False
-    players_vivos = jogadores_vivos()
+    players_vivos = lista_jogadores_vivos()
 
     if jogadores[0].vida == 0:
         print("\nJogadores vivos:", players_vivos)
@@ -298,7 +294,7 @@ def acusa(quantidade_vivos: int) -> list[int, bool]:
 
 
 
-def jogadores_vivos() -> list[str]:
+def lista_jogadores_vivos() -> list[str]:
     '''Função responsável por retornar uma lista dos players vivos, que será utilizada na função de acusar.'''
     global jogadores
     players_vivos = []
@@ -393,9 +389,8 @@ def escolher_acusacao_jogador() -> int:
 def votacao_jogador(escolha_usuario: int, quantidade_vivos: int) -> tuple[bool, int]:
     global jogadores
 
-    defesa_usuario = input(f"{jogadores[0].player}, você pode tentar se defender para se salvar. Digite sua defesa: ") 
-
     if escolha_usuario == 0:
+        defesa_usuario = input(f"{jogadores[0].player}, você pode tentar se defender para se salvar. Digite sua defesa: ") 
         print(f"{jogadores[0].player} está tentando se defender!")
    
     else:
