@@ -1,7 +1,5 @@
 
 
-# FALTA ADC A FUNÇÃO DE MÉDICO FUNCIONALMENTE E ARQUIVO DE RANKING
-
 
 import modExplicacoes
 import random
@@ -58,32 +56,34 @@ class Jogo:
 def jogar() -> None: # Função principal que controla o jogo.
     global jogadores
     global jogadores_vivos
-
     modExplicacoes.inicio() #Dá boas vindas ao user e explicação sobre o jogo
     jogador = input("Digite seu nome antes de começarmos: ").strip().title()
     sleep(0.25)
     definir_funcoes(jogador) # Define as funções dos jogadores, recebe o jogador para falar o nome dele
-
     rodada = 1 # Inicia o contador de rodadas
-
     while jogadores_vivos > 2: # O jogo continua enquanto houver mais de 2 jogadores vivos
         sleep(0.5)
         modExplicacoes.mensagem_de_rodada(rodada)
         morto = matar() # O mafioso mata alguém durante a noite, o qual será guardado nessa variável
-
+        tentativa_de_salvar = medico(morto) # O médico age para tentar salvar alguém.
+        if tentativa_de_salvar:
+            sleep(1)
+            print("O assassino tentou matar alguém na última noite... Mas o médico trabalhou de forma certeira e salvou essa pessoa de seu terrível destino!")
         if verificar_morte(morto) == True: # O jogador morreu e deseja encerrar o jogo
             break
-
         if morto != 0:
             sleep(1)
             modExplicacoes.mensagem_morte_npc(morto)
             jogadores_vivos -= 1
             investigacao_xerife()
-
         if debate() == True:
             break
-
         rodada += 1 # Incrementa a rodada
+        vencedor = definir_vencedor()
+        if vencedor:
+            pontos = 1  # Ponto a cada vitória
+            ranking_jogo(vencedor, pontos)
+
 
 
 
@@ -150,16 +150,12 @@ def matar() -> int:
         Caso contrário, a vítima é escolhida aleatoriamente. A função checa se o alvo é válido ou não e também utiliza
         try except para tratar os erros do código (caso o usuário digite uma string invés de um int ou um int fora do 
         index permitido). '''
-
     global jogadores
     mata = False
-
     if jogadores[0].funcao == "mafioso":
-
         while mata == False:
             try:
                 alvo = int(input("Digite o número do jogador que você deseja matar: "))
-
                 if 0 < alvo < len(jogadores) and jogadores[alvo].vida == 1:
                     print("Alvo Válido.")
                     mata = True
@@ -167,19 +163,16 @@ def matar() -> int:
                     if jogadores[alvo].vida == 0: 
                         sleep(1)
                         print(f"O jogador {alvo} foi assassinado com sucesso.")   
-
                 else:
                         print("Esse jogador já morreu.")
             except:
                 print("Jogador inválido, digite corretamente.")
-    
     else:
         while mata == False:
             alvo = random.randint(0, 4)
             if jogadores[alvo].funcao != "mafioso" and jogadores[alvo].vida == 1:
                 mata = True
-                jogadores[alvo].morte(True) # Alvo sinalizado como morto
-    
+                jogadores[alvo].morte() # Alvo sinalizado como morto
     return alvo # Retorna o jogador que morreu
 
 
@@ -193,7 +186,7 @@ def debate() -> bool:
         return True
 
     if acusacao[1] != -1:
-        jogadores[acusa[1]].morte(True)
+        jogadores[acusacao[1]].morte()
         sleep(0.5)
         print(f"O jogador {jogadores[acusa[1]].player} foi sentenciado a morte por seus companheiros! Ele foi eliminado.")
 
@@ -211,32 +204,39 @@ def medico(vitima: int) -> bool:
         esta pessoa não morrerá e 'reviverá' durante a noite.'''
     global jogadores
     reviveu = False
-    escolha = False
+    escolha_feita = False
     medico_vivo = False
-    for buscando_vida in range(len(jogadores)):
-        if jogadores[buscando_vida].funcao == 'doutor' and jogadores[buscando_vida].vida == 1:
+    
+    # Verifica se existe um médico vivo no jogo
+    for jogador in jogadores:
+        if jogador.funcao == 'doutor' and jogador.vida == 1:
             medico_vivo = True
-    if jogadores[0].funcao == "doutor" and medico_vivo == True:
-        while escolha == False:
-            tentativa_de_salvar = int(input("Digite o nome do jogador que você deseja proteger nesta noite: "))
-            if tentativa_de_salvar == vitima:
-                jogadores[tentativa_de_salvar].revive()
-                reviveu = True
-                escolha = True
-            elif tentativa_de_salvar != vitima and jogadores[tentativa_de_salvar].vida == 0:
-                print("Este jogador morreu em outra noite... Infelizmente já é tarde demais para salvá-lo.")
-            else:
-                escolha = True
-    elif medico_vivo == True:
-        while escolha == False:
-            escolha = random.randint(0, 7)
-            if vitima == escolha:
-                jogadores[tentativa_de_salvar].revive()
-                reviveu = True
-                escolha = True
-            elif jogadores[tentativa_de_salvar].vida == 1:
-                escolha = True
-            
+
+    # Se o usuário for o médico
+    if jogadores[0].funcao == "doutor" and medico_vivo:
+        while not escolha_feita:
+            try:
+                escolhido_para_salvar = int(input("Digite o número do jogador que você deseja proteger nesta noite: "))
+                if 0 <= escolhido_para_salvar < len(jogadores):
+                    if escolhido_para_salvar == vitima:
+                        jogadores[escolhido_para_salvar].revive()
+                        reviveu = True
+                    escolha_feita = True
+                else:
+                    print("Jogador inválido.")
+            except ValueError:
+                print("Entrada inválida. Digite um número.")
+                
+    # Se um NPC for o médico
+    elif medico_vivo:
+        while not escolha_feita:
+            escolha = random.randint(0, len(jogadores) - 1)
+            if jogadores[escolha].vida == 1:  # Verifica se o jogador escolhido está vivo
+                if escolha == vitima:
+                    jogadores[escolha].revive()
+                    reviveu = True
+                escolha_feita = True
+
     return reviveu
 
 
@@ -351,7 +351,7 @@ def votacao_npc(escolha: int, voto: int, quantidade_vivos: int) -> tuple[bool, i
         sleep(1)
         print("\nVotação concluída! O jogador acusado foi eliminado. Ele não era o mafioso!")
         quantidade_vivos -= 1
-        jogadores[escolha].morte(True)
+        jogadores[escolha].morte()
         return True, quantidade_vivos
     elif voto == 1 and jogadores[escolha].funcao == "mafioso":
         sleep(2)
@@ -405,12 +405,12 @@ def votacao_jogador(escolha_usuario: int, quantidade_vivos: int) -> tuple[bool, 
     
     if voto_final == 1 and jogadores[escolha_usuario].funcao != "mafioso":
         print(f"O {jogadores[escolha_usuario].usuario} não era o mafioso! Boa sorte na próxima votação.")
-        jogadores[escolha_usuario].morte(True)
+        jogadores[escolha_usuario].morte()
         return True, quantidade_vivos - 1
     
     elif voto_final == 1 and jogadores[escolha_usuario].funcao == "mafioso":
         print(f"O {jogadores[escolha_usuario].usuario} ERA o mafioso! A CIDADE VENCEU!")
-        jogadores[escolha_usuario].morte(True)
+        jogadores[escolha_usuario].morte()
         return True, 0
     
     else:
@@ -431,6 +431,80 @@ def exibir_defesa_jogador(escolha_usuario: int):
     print(f"O {jogadores[escolha_usuario].player} vai se defender: \n")
     print(random.choice(lista_defesas))
 
+
+
+
+
+# SISTEMA DE RANKEAMENTO DOS JOGADORES UTILIZANDO DE BASE A ATIVIDADE PASSADA EM SALA DE AULA
+
+def definir_vencedor() -> str:
+    """Função para definir o vencedor no final do jogo"""
+    for jogador in jogadores:
+        if jogador.vida == 1:
+            return jogador.player
+    return ""
+
+def ler_dados(arquivo: str) -> list:
+    """Lê o arquivo de ranking e retorna uma lista de dados"""
+    with open(arquivo, encoding='UTF-8') as arq:
+        return arq.readlines()
+        
+
+
+def salvar_dados(data: list, arquivo: str) -> None:
+    """Salva os dados no arquivo"""
+    with open(arquivo, 'w', encoding='UTF-8') as arq:
+        for line in data:
+            arq.write(line)
+
+
+
+def exibir_ranking() -> None:
+    """Exibe o ranking de jogadores"""
+    ranking = ler_dados('ranking.txt')
+    if not ranking:
+        print("Nenhum dado no ranking ainda.")
+        return
+
+    print("\nRanking de Jogadores:")
+    for user in ranking:
+        nome, pontos = user.replace('\n', '').split(';')
+        print(f'{nome} - {pontos} pontos')
+
+
+
+def atualizar_ranking(nome: str, pontos: int) -> None:
+    """Atualiza o ranking com a pontuação do jogador"""
+    ranking = ler_dados('ranking.txt')
+
+    atualizado = False
+    for i in range(len(ranking)): # Se o jogador já estiver no ranking
+        jogador, pontuacao_atual = ranking[i].replace('\n', '').split(';')
+        if jogador == nome:
+            nova_pontuacao = int(pontuacao_atual) + pontos
+            ranking[i] = f'{jogador};{nova_pontuacao}\n'
+            atualizado = True
+            break
+    
+    if not atualizado: # Se não estiver, vai adicionar
+        ranking.append(f'{nome};{pontos}\n')
+
+    # Rankeando por pontos de forma decrescente
+    ranking.sort(key=lambda item: int(item.split(';')[-1]), reverse=True)
+
+    # Ranking atualizado
+    salvar_dados(ranking, 'ranking.txt')
+
+
+
+
+def ranking_jogo(vencedor: str, pontos: int) -> None:
+    """Função chamada ao final do jogo para atualizar o ranking"""
+    print(f"\nParabéns {vencedor}! Você ganhou {pontos} pontos.")
+    atualizar_ranking(vencedor, pontos)
+
+    # Exibe o ranking atualizado
+    exibir_ranking()
 
 
 
