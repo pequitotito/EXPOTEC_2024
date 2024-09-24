@@ -15,7 +15,10 @@ class Jogo:
         self.vida = 1 # Vida inicial do jogador
         self.player = player # Nome do jogador
         self.usuario = usuario # Identificador do jogador (0 para o usuário, outros números para NPCs)
-
+    '''Inicializa uma nova instância de um jogador no jogo, definindo atributos.
+    O __init__ é responsável por criar e configurar um objeto jogador. Ele aceita
+    três parâmetros: usuario, player, e função. Esses parâmetros são usados para 
+    definir as características iniciais do jogador.'''
 
     
     def selecionar_papeis(self, papel: str) -> None:
@@ -37,6 +40,11 @@ class Jogo:
             print("")
             sleep(0.25)
             print(f"{self.player}, você é um {funcao}! 🤫🤫🤫")
+
+        '''Atribui um papel a um jogador com base na entrada fornecida e, se o jogador for o usuário, exibe a função atribuída.
+        Este método recebe um argumento que define o papel do jogador (mafioso, doutor, xerife ou cidadão) e associa 
+        essa função ao jogador. Dependendo do valor do argumento papel, a função correspondente é definida.'''
+
 
     
     def morte(self) -> None:
@@ -91,6 +99,8 @@ def jogar() -> None: # Função principal que controla o jogo.
 
 
 def definir_funcoes(jogador: str):
+    '''Função responsável por definir os papéis de cada jogador (usuário e os NPCs).
+       Os papéis são: um doutor, um xerife, um mafioso e cinco cidadãos.'''
     funcoes = ["d", "x", "m", "c", "c", "c", "c", "c"]
 
     func = random.choice(funcoes)
@@ -214,6 +224,8 @@ def xerife() -> None:
                 
 
 def investigacao_xerife() -> None:
+    '''Realiza a investigação do xerife, permitindo que ele identifique um jogador.
+       A função verifica se o jogador que está chamando a função é o xerife e está vivo.'''
     global jogadores
     if jogadores[0].funcao == "xerife" and jogadores[0].vida == 1:
         xerife()
@@ -225,6 +237,9 @@ def investigacao_xerife() -> None:
 
 
 def user_morto(jogador):
+    '''Essa função serve para identificar quando o usuário for morto, informando que ele foi
+    assassinado. Após a exibição da mensagem, o usuário é perguntado se deseja continuar
+    assistindo ao jogo. Dependendo da resposta, o jogo pode ser finalizado ou continuar'''
     global jogadores
     terminar = False
     print(f"Durante a noite, o assassino fez algo terrível... Invadiu a casa de {jogador} e cometeu um ato brutal.")
@@ -249,7 +264,9 @@ def user_morto(jogador):
 
 
 
+
 def verificar_morte(morto:int) -> bool:
+    '''Verifica se um jogador foi assassinado e atualiza o estado do jogo.'''
     global jogadores_vivos
     if morto == 0:
         if user_morto(jogadores[0].player):
@@ -280,6 +297,9 @@ def lista_jogadores_vivos() -> list[str]:
 
 
 def debate() -> bool:
+    '''Função a qual foi reduzida, mas responsável por iniciar o debate entre os jogadores
+        quando está de "dia" (ou seja, quando os cidadãos estão acordados e vão tentar achar
+        o assassino). Ela chama a função acusa que começa a acusação entre os jogadores.'''
     global jogadores_vivos
     sleep(2)
     print("Agora os jogadores vão debater para tentar achar o mafioso!")
@@ -350,6 +370,10 @@ def acusacao_npcs(quantidade_vivos: int) -> tuple[bool, int]:
 
 
 def votacao_npc(escolha: int, voto: int, quantidade_vivos: int) -> tuple[bool, int]:
+    '''Essa função processa a votação dos NPCs para eliminar um jogador.
+        Ela verifica o voto do NPC sobre o jogador escolhido: o voto 1 indica que e o jogador
+        for o mafioso, ele será eliminado e a cidade vence o jogo; se o voto for 2 e o jogador
+        NÃO for o mafioso, ele será eliminado mas aparecerá que ele não era o mafioso.'''
     global jogadores
     if voto == 2 and jogadores[escolha].funcao != "mafioso":
         sleep(1)
@@ -404,6 +428,9 @@ def acusacao_jogadores(quantidade_vivos: int) -> tuple[bool, int]:
 
 
 def escolher_acusacao_jogador() -> int:
+    '''Essa função serve para que o usuário escolha alguém para acusar durante o debate (ele só
+        não pode acusar a si mesmo). Verifica se o escolhido está vivo e dentro dos limites para
+        fazer a acusação.'''
     global jogadores
     escolha = False
     while not escolha:
@@ -448,6 +475,8 @@ def votacao_jogador(escolha_usuario: int, quantidade_vivos: int) -> tuple[bool, 
 
 
 def exibir_defesa_jogador(escolha_usuario: int):
+    '''Essa função serve para que, quando o acusado for um NPC, ele se defenda utilizando
+        a lista de defesas de forma aleatória, que será impressa para o usuário.'''
     global jogadores
     lista_defesas = [
         "Eu não fiz nada! Nem estava acordado na última noite.",
@@ -462,12 +491,12 @@ def exibir_defesa_jogador(escolha_usuario: int):
 
 
 def escolher_acusacao_npc(ja_acusado: int) -> int:
-    '''Função responsável por definir quem será o player acusado. Será utilizada na função de acusar.'''
+    '''Função responsável por definir quem será o player acusado de forma aleatória. Será utilizada na função de acusar.'''
     global jogadores
     acusacao = False
 
     while not acusacao:
-        escolha = random.randint(1, 4)
+        escolha = random.randint(0, len(jogadores) - 1)
 
         if escolha < len(jogadores) and jogadores[escolha].vida == 1 and escolha != ja_acusado:
             acusacao = True
@@ -487,6 +516,8 @@ def definir_vencedor() -> str:
             return jogador.player
     return ""
 
+
+
 def jogador_venceu() -> bool:
     """Verifica se o jogador venceu o jogo"""
     global jogadores
@@ -500,6 +531,8 @@ def jogador_venceu() -> bool:
                 return True
             
     return False
+
+
 
 def ler_dados(arquivo: str) -> list:
     """Lê o arquivo de ranking e retorna uma lista de dados"""
@@ -571,4 +604,8 @@ def ranking_jogo(vencedor: str, pontos: int) -> None:
 
 if __name__ == "__main__":
     jogar()
-    
+
+    '''Verifica se o script está sendo executado diretamente.
+    Esta condição é usada para determinar se o arquivo python 
+    está sendo executado como o programa principal. Se for o caso, 
+    a função 'jogar()' é chamada, dando início ao jogo. '''
