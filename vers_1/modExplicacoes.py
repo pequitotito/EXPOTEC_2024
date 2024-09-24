@@ -4,6 +4,11 @@ from time import sleep
 
 
 def inicio() -> None:
+    '''Exibe a tela de início do jogo Máfia e introduz o jogador.
+    A função pergunta ao jogador se ele deseja receber uma explicação sobre as regras do jogo. 
+    Se o jogador optar por uma explicação, a função dar_explicacao é chamada. 
+    Caso contrário, a função informa que o jogo começará sem mais explicações.'''
+
     print('''
 MMMMMMMMM        MMMMMMMMMMMM              MMMMMMMMMMMM             MMMMMMMMMMMMMMMM    MMMM             MMMMMMMMMMMM                 ⠀⠀⠀⠀⠀⢀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⣀⣀⣀⣤⣤       
 MMMM   MMMM      MMMMM   MMMM             MMMM MMMM MMMM            MMMMMMMMMMMMMMMM    MMMM            MMMM MMMM MMMM                    ⢶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿
@@ -27,6 +32,7 @@ MMMM                     MMMM     MMMM                      MMMM    MMMM        
         print("Já que você não precisa de mais explicações... Vamos ao jogo!")
 
 def dar_explicacao() -> None:
+    '''Função com uma lista de mensagens que serão exibidas caso o usuário deseje uma explicação sobre o jogo.'''
     mensagens = [
         "\nHá nesta cidade um terrível assassino... Ele busca assassinar todos os jogadores a sangue frio\ne causar discórdia entre os moradores da cidade\n",
         "Há um narrador que dará informações durante todo o jogo. Logo no início sçao distribuídos papéis entre os jogadores.\nOs papéis são:\nMafioso\nMédico\nXerife\nCidadão\n\n",
@@ -47,7 +53,8 @@ def dar_explicacao() -> None:
 
     
 def mensagem_fim_de_jogo(vitoria: bool):
-    '''Caso seja vitória da Cidade, exibe que foi vitória dos jogadores. Caso seja vitória do mafioso, foi derrota dos jogadores.'''
+    '''Caso seja vitória da Cidade, exibe que foi vitória dos jogadores. Caso seja vitória do mafioso, 
+        foi derrota dos jogadores.'''
     print("\n" + "*" * 50)
     
     if vitoria:
