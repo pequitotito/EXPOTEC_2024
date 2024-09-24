@@ -87,6 +87,143 @@ def jogar() -> None: # Função principal que controla o jogo.
 
 
 
+# FUNÇÕES DE AÇÃO (Matar, investigar, médico, xerife)
+
+
+def definir_funcoes(jogador: str):
+    funcoes = ["d", "x", "m", "c", "c", "c", "c", "c"]
+
+    func = random.choice(funcoes)
+
+    # Preenche o papel do usuário e imprime para ele
+    jogadores.append(Jogo(0, jogador))
+    jogadores[0].selecionar_papeis(func)
+    funcoes.remove(func)
+
+    # Preenche os papéis dos jogadores que são computador
+    for npc in range(1, 8):
+        func = random.choice(funcoes) 
+        jogadores.append(Jogo(npc, f"Jogador {npc}"))
+        jogadores[npc].selecionar_papeis(func) 
+        funcoes.remove(func)
+
+
+
+
+def matar() -> int:
+    ''' Essa função é responsável por selecionar e matar um jogador. Caso o usuário for o mafioso, ele escolhe a vítima.
+        Caso contrário, a vítima é escolhida aleatoriamente. A função checa se o alvo é válido ou não e também utiliza
+        try except para tratar os erros do código (caso o usuário digite uma string invés de um int ou um int fora do 
+        index permitido). '''
+    global jogadores
+    mata = False
+    if jogadores[0].funcao == "mafioso":
+        while mata == False:
+            try:
+                alvo = int(input("Digite o número do jogador que você deseja matar: "))
+                if 0 < alvo < len(jogadores) and jogadores[alvo].vida == 1:
+                    print("Alvo Válido.")
+                    mata = True
+                    jogadores[alvo].morte() # O alvo estará morto 
+                    if jogadores[alvo].vida == 0: 
+                        sleep(1)
+                        print(f"O jogador {alvo} foi assassinado com sucesso.")   
+                else:
+                        print("Esse jogador já morreu.")
+            except:
+                print("Jogador inválido, digite corretamente.")
+    else:
+        while mata == False:
+            alvo = random.randint(0, len(jogadores) - 1)
+            if jogadores[alvo].funcao != "mafioso" and jogadores[alvo].vida == 1:
+                mata = True
+                jogadores[alvo].morte() # Alvo sinalizado como morto
+    return alvo # Retorna o jogador que morreu
+
+
+
+
+def medico(vitima: int) -> bool: 
+    '''Essa função é para que o médico consiga escolher uma pessoa para proteger por noite. Caso o assassino tente matar o protegido pelo médico,
+        esta pessoa não morrerá e 'reviverá' durante a noite.'''
+    global jogadores
+    reviveu = False
+    escolha_feita = False
+    medico_vivo = False
+    for jogador in jogadores: # Verifica se existe um médico vivo no jogo
+        if jogador.funcao == 'doutor' and jogador.vida == 1:
+            medico_vivo = True
+    if jogadores[0].funcao == "doutor" and medico_vivo:     # Se o usuário for o médico
+        while not escolha_feita:
+            try:
+                escolhido_para_salvar = int(input("Digite o número do jogador que você deseja proteger nesta noite: "))
+                if 0 <= escolhido_para_salvar < len(jogadores):
+                    if escolhido_para_salvar == vitima:
+                        jogadores[escolhido_para_salvar].revive()
+                        reviveu = True
+                    escolha_feita = True
+                else:
+                    print("Jogador inválido.")
+            except ValueError:
+                print("Entrada inválida. Digite um número.")  
+    elif medico_vivo:    # Se um NPC for o médico
+        while not escolha_feita:
+            escolha = random.randint(0, len(jogadores) - 1)
+            if jogadores[escolha].vida == 1:  # Verifica se o jogador escolhido está vivo
+                if escolha == vitima:
+                    jogadores[escolha].revive()
+                    reviveu = True
+                escolha_feita = True
+    return reviveu
+
+
+
+
+def xerife() -> None:
+    '''  Função responsável pela investigação do usuário quando ele for o xerife para tentar descobrir quem é o assassino.
+         Caso o jogador descubra quem é o assassino, ele poderá tentar votar o assassino fora com os outros NPCs, que
+         aleatoriamente irão concordar ou discordar dele.'''
+    global jogadores
+    acusacao = False
+    if jogadores[0].funcao == "xerife":
+        while acusacao == False:
+            try:
+                sleep(1)
+                acusado = int(input("Digite o número do jogador que você deseja investigar se é o assassino ou não: "))
+                if 0 < acusado < len(jogadores) and jogadores[acusado].vida == 1:
+                    if jogadores[acusado].funcao == "mafioso":
+                        sleep(0.5)
+                        print(f"O {jogadores[acusado].player} é o assassino!!!")
+                        sleep(0.5)
+                        print("Converse com os outros moradores da Cidade para o eliminar!")
+                        acusacao = True
+                    else:
+                        sleep(0.5)
+                        print(f"O {jogadores[acusado].player} não é o assassino... Ele ainda está a solta. ")
+                        acusacao = True
+                elif jogadores[acusado].vida == 0:
+                    sleep(0.5)
+                    print(f"O {jogadores[acusado].player} já está morto!! Investigue outro jogador.")
+                else:
+                    sleep(0.5)
+                    print(f"Jogador inválido. Tome cuidado com a investigação, Xerife {jogadores[0].player}.")
+            except:
+                sleep(0.25)
+                print("Inválido, tente novamente.")
+                
+                
+
+def investigacao_xerife() -> None:
+    global jogadores
+    if jogadores[0].funcao == "xerife" and jogadores[0].vida == 1:
+        xerife()
+
+
+
+
+# FUNÇÕES AUXILIARES
+
+
 def user_morto(jogador):
     global jogadores
     terminar = False
@@ -122,54 +259,24 @@ def verificar_morte(morto:int) -> bool:
     
 
 
-def definir_funcoes(jogador: str):
-    funcoes = ["d", "x", "m", "c", "c", "c", "c", "c"]
 
-    func = random.choice(funcoes)
-
-    # Preenche o papel do usuário e imprime para ele
-    jogadores.append(Jogo(0, jogador))
-    jogadores[0].selecionar_papeis(func)
-    funcoes.remove(func)
-
-    # Preenche os papéis dos jogadores que são computador
-    for npc in range(1, 8):
-        func = random.choice(funcoes) 
-        jogadores.append(Jogo(npc, f"Jogador {npc}"))
-        jogadores[npc].selecionar_papeis(func) 
-        funcoes.remove(func)
-
-
-
-def matar() -> int:
-    ''' Essa função é responsável por selecionar e matar um jogador. Caso o usuário for o mafioso, ele escolhe a vítima.
-        Caso contrário, a vítima é escolhida aleatoriamente. A função checa se o alvo é válido ou não e também utiliza
-        try except para tratar os erros do código (caso o usuário digite uma string invés de um int ou um int fora do 
-        index permitido). '''
+def lista_jogadores_vivos() -> list[str]:
+    '''Função responsável por retornar uma lista dos players vivos, que será utilizada na função de acusar.'''
     global jogadores
-    mata = False
-    if jogadores[0].funcao == "mafioso":
-        while mata == False:
-            try:
-                alvo = int(input("Digite o número do jogador que você deseja matar: "))
-                if 0 < alvo < len(jogadores) and jogadores[alvo].vida == 1:
-                    print("Alvo Válido.")
-                    mata = True
-                    jogadores[alvo].morte() # O alvo estará morto 
-                    if jogadores[alvo].vida == 0: 
-                        sleep(1)
-                        print(f"O jogador {alvo} foi assassinado com sucesso.")   
-                else:
-                        print("Esse jogador já morreu.")
-            except:
-                print("Jogador inválido, digite corretamente.")
-    else:
-        while mata == False:
-            alvo = random.randint(0, len(jogadores) - 1)
-            if jogadores[alvo].funcao != "mafioso" and jogadores[alvo].vida == 1:
-                mata = True
-                jogadores[alvo].morte() # Alvo sinalizado como morto
-    return alvo # Retorna o jogador que morreu
+    players_vivos = []
+
+    for jogador in jogadores:
+        if jogador.vida == 1:
+            players_vivos.append(jogador.usuario)
+
+    return players_vivos
+
+
+
+
+
+
+# FUNÇÕES DE DEBATE E ACUSAÇÕES
 
 
 def debate() -> bool:
@@ -192,6 +299,8 @@ def debate() -> bool:
             return True # Termina pois o user foi eliminado
         
     return False
+
+
 
 
 def acusa(quantidade_vivos: int) -> list[int, bool]: 
@@ -239,6 +348,7 @@ def acusacao_npcs(quantidade_vivos: int) -> tuple[bool, int]:
                 return False, quantidade_vivos
 
 
+
 def votacao_npc(escolha: int, voto: int, quantidade_vivos: int) -> tuple[bool, int]:
     global jogadores
     if voto == 2 and jogadores[escolha].funcao != "mafioso":
@@ -257,119 +367,6 @@ def votacao_npc(escolha: int, voto: int, quantidade_vivos: int) -> tuple[bool, i
         return False, quantidade_vivos
 
 
-
-
-def medico(vitima: int) -> bool: 
-    '''Essa função é para que o médico consiga escolher uma pessoa para proteger por noite. Caso o assassino tente matar o protegido pelo médico,
-        esta pessoa não morrerá e 'reviverá' durante a noite.'''
-    global jogadores
-    reviveu = False
-    escolha_feita = False
-    medico_vivo = False
-    
-    # Verifica se existe um médico vivo no jogo
-    for jogador in jogadores:
-        if jogador.funcao == 'doutor' and jogador.vida == 1:
-            medico_vivo = True
-
-    # Se o usuário for o médico
-    if jogadores[0].funcao == "doutor" and medico_vivo:
-        while not escolha_feita:
-            try:
-                escolhido_para_salvar = int(input("Digite o número do jogador que você deseja proteger nesta noite: "))
-                if 0 <= escolhido_para_salvar < len(jogadores):
-                    if escolhido_para_salvar == vitima:
-                        jogadores[escolhido_para_salvar].revive()
-                        reviveu = True
-                    escolha_feita = True
-                else:
-                    print("Jogador inválido.")
-            except ValueError:
-                print("Entrada inválida. Digite um número.")
-                
-    # Se um NPC for o médico
-    elif medico_vivo:
-        while not escolha_feita:
-            escolha = random.randint(0, len(jogadores) - 1)
-            if jogadores[escolha].vida == 1:  # Verifica se o jogador escolhido está vivo
-                if escolha == vitima:
-                    jogadores[escolha].revive()
-                    reviveu = True
-                escolha_feita = True
-
-    return reviveu
-
-
-
-def xerife() -> None:
-    '''  Função responsável pela investigação do usuário quando ele for o xerife para tentar descobrir quem é o assassino.
-         Caso o jogador descubra quem é o assassino, ele poderá tentar votar o assassino fora com os outros NPCs, que
-         aleatoriamente irão concordar ou discordar dele.'''
-    global jogadores
-    acusacao = False
-    if jogadores[0].funcao == "xerife":
-        while acusacao == False:
-            try:
-                sleep(1)
-                acusado = int(input("Digite o número do jogador que você deseja investigar se é o assassino ou não: "))
-                if 0 < acusado < len(jogadores) and jogadores[acusado].vida == 1:
-                    if jogadores[acusado].funcao == "mafioso":
-                        sleep(0.5)
-                        print(f"O {jogadores[acusado].player} é o assassino!!!")
-                        sleep(0.5)
-                        print("Converse com os outros moradores da Cidade para o eliminar!")
-                        acusacao = True
-                    else:
-                        sleep(0.5)
-                        print(f"O {jogadores[acusado].player} não é o assassino... Ele ainda está a solta. ")
-                        acusacao = True
-                elif jogadores[acusado].vida == 0:
-                    sleep(0.5)
-                    print(f"O {jogadores[acusado].player} já está morto!! Investigue outro jogador.")
-                else:
-                    sleep(0.5)
-                    print(f"Jogador inválido. Tome cuidado com a investigação, Xerife {jogadores[0].player}.")
-            except:
-                sleep(0.25)
-                print("Inválido, tente novamente.")
-                
-
-def investigacao_xerife() -> None:
-    global jogadores
-    if jogadores[0].funcao == "xerife" and jogadores[0].vida == 1:
-        xerife()
-
-
-
-
-
-
-def lista_jogadores_vivos() -> list[str]:
-    '''Função responsável por retornar uma lista dos players vivos, que será utilizada na função de acusar.'''
-    global jogadores
-    players_vivos = []
-
-    for jogador in jogadores:
-        if jogador.vida == 1:
-            players_vivos.append(jogador.usuario)
-
-    return players_vivos
-
-
-
-def escolher_acusacao_npc(ja_acusado: int) -> int:
-    '''Função responsável por definir quem será o player acusado. Será utilizada na função de acusar.'''
-    global jogadores
-    acusacao = False
-
-    while not acusacao:
-        escolha = random.randint(1, 4)
-
-        if escolha < len(jogadores) and jogadores[escolha].vida == 1 and escolha != ja_acusado:
-            acusacao = True
-            print(f"\nOs jogadores decidiram acusar o player {escolha}. Hora da votação!")
-
-    return escolha
 
 
 
@@ -394,7 +391,13 @@ def acusacao_jogadores(quantidade_vivos: int) -> tuple[bool, int]:
                 return True, quantidade_vivos - 1
         else:
             print(f"\nOs outros jogadores não aceitaram sua acusação, {jogadores[0].player}.")
-            print(f"O jogador {escolha_usuario} não foi eliminado.")
+            nova_acusacao = random.randint(1, len(jogadores) - 1)
+            while jogadores[nova_acusacao].vida == 0 or nova_acusacao == escolha_usuario:
+                nova_acusacao = random.randint(1, len(jogadores) - 1)
+            
+            print(f"Os jogadores decidiram acusar o jogador {nova_acusacao}.")
+
+            # Agora o novo jogador será investigado
             return False, quantidade_vivos
 
 
@@ -456,6 +459,21 @@ def exibir_defesa_jogador(escolha_usuario: int):
     print(f"O {jogadores[escolha_usuario].player} vai se defender: \n")
     print(random.choice(lista_defesas))
 
+
+
+def escolher_acusacao_npc(ja_acusado: int) -> int:
+    '''Função responsável por definir quem será o player acusado. Será utilizada na função de acusar.'''
+    global jogadores
+    acusacao = False
+
+    while not acusacao:
+        escolha = random.randint(1, 4)
+
+        if escolha < len(jogadores) and jogadores[escolha].vida == 1 and escolha != ja_acusado:
+            acusacao = True
+            print(f"\nOs jogadores decidiram acusar o player {escolha}. Hora da votação!")
+
+    return escolha
 
 
 
