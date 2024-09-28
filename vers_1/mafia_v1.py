@@ -52,7 +52,7 @@ class Jogo:
         self.vida = 0
         if self.usuario == 0:
             print("")
-            print(f"{self.player}, nesta madrugada você foi morto!")
+            print(f"{self.player}, você foi eliminado!")
 
 
     def revive(self) -> None:
@@ -113,19 +113,21 @@ def processar_rodada(rodada: int) -> None:
         JOGADORES_VIVOS -= 1
         investigacao_xerife()
     
-    if debate():
+    if debate():  # Verifica se o debate encerrou o jogo
         return
 
 
 def finalizar_jogo() -> None:
-    '''Verifica o estado final do jogo e determina o vencedor.'''
+    """Verifica o estado final do jogo e determina o vencedor."""
     vencedor = definir_vencedor()
-    if (jogadores[0].vida == 1 and jogador_venceu()) or (jogadores[0].funcao == "mafioso" and JOGADORES_VIVOS <= 2):
+
+    if (jogadores[0].vida == 1 and jogador_venceu()): 
         if not vencedor.startswith("Jogador"):
             print(f"\nParabéns {vencedor}! Você ganhou 1 ponto.")
             ranking_jogo(vencedor, 1)
         modExplicacoes.mensagem_fim_de_jogo(True)
-    else:
+
+    else:  # Se o jogador perdeu
         print(f"\n{jogadores[0].player}, você foi eliminado e perdeu o jogo.")
         modExplicacoes.mensagem_fim_de_jogo(False)
 
@@ -542,19 +544,20 @@ def definir_vencedor() -> str:
 
 def jogador_venceu() -> bool:
     """Verifica se o jogador venceu o jogo"""
-    global jogadores
 
-    if jogadores[0].funcao == "mafioso" and jogadores[0].vida == 1 and JOGADORES_VIVOS <= 2:
-        return True
+    # Se o jogador é o mafioso
+    if jogadores[0].funcao == "mafioso":
+        # O jogador vence se ele é o mafioso e restam apenas 2 jogadores vivos (ele e mais um)
+        return jogadores[0].vida == 1 and JOGADORES_VIVOS == 2
 
-    else:  # Caso o jogador não seja o mafioso
+    else:  # Se o jogador NÃO for o mafioso
         for jogador in jogadores:
-            # Se o mafioso estiver morto, os cidadãos ganham
+            # O jogador vence se o mafioso foi morto durante o jogo
             if jogador.funcao == "mafioso" and jogador.vida == 0:
-                if jogadores[0].funcao in ["cidadão", "xerife", "doutor"]:
-                    return True
+                return True
 
-    return False 
+    # Caso contrário, ele não vence
+    return False
 
 
 
