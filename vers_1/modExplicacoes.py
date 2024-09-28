@@ -52,15 +52,15 @@ def dar_explicacao() -> None:
         print(msg)
 
     
-def mensagem_fim_de_jogo(vitoria: bool):
+def mensagem_fim_de_jogo(vitoria: bool) -> None:
     '''Caso seja vitória da Cidade, exibe que foi vitória dos jogadores. Caso seja vitória do mafioso, 
         foi derrota dos jogadores.'''
     print("\n" + "*" * 50)
     
     if vitoria:
-        print("\n" + " " * 10 + "PARABÉNS! VOCÊS VENCERAM!".center(50))
+        print("\n" + " " * 10 + "PARABÉNS! VOCÊS VENCERAM!".center(25))
     else:
-        print("\n" + " " * 10 + "VOCÊS PERDERAM. TENTE NOVAMENTE!".center(50))
+        print("\n" + " " * 10 + "VOCÊ PERDEU. TENTE NOVAMENTE!".center(25))
     
     print("\n" + "*" * 50 + "\n")
 
@@ -70,9 +70,9 @@ def mensagem_fim_de_jogo(vitoria: bool):
 def mensagem_de_rodada(rodada: int) -> None:
     '''Função feita apenas para exibir na tela a mensagem de qual rodada está começando.
        Feita para dividir a função principal 'jogar' em várias subfunções.'''
-    print("\n" + "=" * 40)
-    print(f"::: Início da Rodada {rodada} :::")
-    print("=" * 40 + "\n")
+    print("\n" + "=" * 50)
+    print(f"::: Início da Rodada {rodada} :::".center(25))
+    print("=" * 50 + "\n")
 
 
 
@@ -85,3 +85,4 @@ def mensagem_morte_npc(morto: int) -> None:
         f"Nesta noite, o assassino matou o Jogador {morto}."
     ]
     print(random.choice(frases_morte))
+    
