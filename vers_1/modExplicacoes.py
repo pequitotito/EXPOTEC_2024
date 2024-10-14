@@ -58,7 +58,7 @@ def mensagem_fim_de_jogo(vitoria: bool) -> None:
     print("\n" + "*" * 50)
     
     if vitoria:
-        print("\n" + " " * 10 + "PARABÉNS! VOCÊS VENCERAM!".center(25))
+        print("\n" + " " * 10 + "PARABÉNS! VOCÊ VENCEU!!!".center(25))
     else:
         print("\n" + " " * 10 + "VOCÊ PERDEU. TENTE NOVAMENTE!".center(25))
     
@@ -80,9 +80,9 @@ def mensagem_de_rodada(rodada: int) -> None:
 def mensagem_morte_npc(morto: int) -> None:
     """Exibe uma mensagem aleatória sobre a morte de um NPC."""
     frases_morte = [
-        f"Nesta última madrugada, o Jogador {morto} foi assassinado no local de trabalho.",
-        f"Na noite passada, o Jogador {morto} foi encontrado morto dentro de sua casa.",
-        f"Nesta noite, o assassino matou o Jogador {morto}."
+        f"\nNesta última madrugada, o Jogador {morto} foi assassinado no local de trabalho.",
+        f"\nNa noite passada, o Jogador {morto} foi encontrado morto dentro de sua casa.",
+        f"\nNesta noite, o assassino matou o Jogador {morto}."
     ]
     print(random.choice(frases_morte))
     
