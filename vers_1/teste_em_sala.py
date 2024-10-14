@@ -75,7 +75,7 @@ def jogar() -> None:
         
         processar_rodada(rodada)
         sleep(4)
-        os.system("cls")
+        os.system('cls' if os.name == 'nt' else 'clear')
         rodada += 1
 
     finalizar_jogo()
