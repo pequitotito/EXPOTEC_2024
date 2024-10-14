@@ -1,4 +1,5 @@
 
+import os
 import random
 from time import sleep
 
@@ -50,6 +51,9 @@ def dar_explicacao() -> None:
     for msg in mensagens:
         sleep(1.5)
         print(msg)
+            
+    sleep(3)
+    os.system('cls' if os.name == 'nt' else 'clear')
 
     
 def mensagem_fim_de_jogo(vitoria: bool) -> None:
