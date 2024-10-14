@@ -29,7 +29,7 @@ MMMM                     MMMM     MMMM                      MMMM    MMMM        
         dar_explicacao()
     else:
         sleep(0.25)    
-        print("Já que você não precisa de mais explicações... Vamos ao jogo!")
+        print("\nJá que você não precisa de mais explicações... Vamos ao jogo!")
 
 def dar_explicacao() -> None:
     '''Função com uma lista de mensagens que serão exibidas caso o usuário deseje uma explicação sobre o jogo.'''
