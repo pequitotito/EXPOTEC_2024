@@ -1,6 +1,6 @@
 
 
-
+import os
 import modExplicacoes
 import random
 from time import sleep
@@ -74,6 +74,8 @@ def jogar() -> None:
             break
         
         processar_rodada(rodada)
+        sleep(4)
+        os.system("cls")
         rodada += 1
 
     finalizar_jogo()
@@ -169,7 +171,7 @@ def matar() -> int:
     if jogadores[0].funcao == "mafioso":
         while mata == False:
             try:
-                print(lista_jogadores_vivos())
+                print("Jogadores vivos: ", lista_jogadores_vivos())
                 alvo = int(input("Digite o número do jogador que você deseja matar: "))
                 if alvo < 1 or alvo >= len(jogadores):
                     print("Esse jogador não existe.")
@@ -226,7 +228,7 @@ def escolher_jogador_para_proteger() -> int:
     while True:
         try:
             escolhido = int(input("Digite o número do jogador que você deseja proteger durante a noite: "))
-            print(lista_jogadores_vivos())
+            print("Jogadores vivos: ", lista_jogadores_vivos())
             if 0 <= escolhido < len(jogadores):
                 return escolhido
             print("Jogador não existe.")
@@ -265,6 +267,7 @@ def xerife() -> None:
             try:
                 sleep(1)
                 acusado = int(input("Digite o número do jogador que você deseja investigar se é o assassino ou não: "))
+                print("Jogadores vivos: ", lista_jogadores_vivos())
                 if 0 < acusado < len(jogadores) and jogadores[acusado].vida == 1:
                     if jogadores[acusado].funcao == "mafioso":
                         sleep(0.5)
