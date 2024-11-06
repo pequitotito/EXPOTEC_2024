@@ -41,6 +41,7 @@ class Jogo:
             sleep(0.25)
             print(f"{self.player}, você é um {funcao}! 🤫🤫🤫")
             print("\nIMPORTANTE!!!\nVocê é o Jogador 0, logo não pode se acusar ou tentar se matar como mafioso.")
+            print("Jogadores: [0, 1, 2, 3, 4, 5, 6, 7]")
 
         '''Atribui um papel a um jogador com base na entrada fornecida e, se o jogador for o usuário, exibe a função atribuída.
         Este método recebe um argumento que define o papel do jogador (mafioso, doutor, xerife ou cidadão) e associa 
@@ -240,8 +241,11 @@ def processar_escolha_medico(escolhido: int, vitima: int) -> bool:
     if escolhido == vitima:
         jogadores[escolhido].revive()
         return True
-    elif jogadores[escolhido].vida == 0:
-        print("Esse jogador morreu em outra rodada e não pode mais ser salvo. Escolha outro.")
+    
+#    while jogadores[escolhido].vida == 0:
+#        print("Esse jogador morreu em outra rodada e não pode mais ser salvo. Escolha outro.")
+#        escolher_jogador_para_proteger()
+
     return False
 
 
