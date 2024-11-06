@@ -164,8 +164,7 @@ def definir_funcoes(jogador: str) -> None:
 def matar() -> int:
     ''' Essa função é responsável por selecionar e matar um jogador. Caso o usuário for o mafioso, ele escolhe a vítima.
         Caso contrário, a vítima é escolhida aleatoriamente. A função checa se o alvo é válido ou não e também utiliza
-        try except para tratar os erros do código (caso o usuário digite uma string invés de um int ou um int fora do 
-        index permitido). '''
+        try except para tratar os erros do código (caso o usuário digite uma string invés de um int ou um int fora do index permitido). '''
     global jogadores
     mata = False
     if jogadores[0].funcao == "mafioso":
@@ -387,7 +386,7 @@ def debate() -> bool:
 
 
 
-def acusa(quantidade_vivos: int) -> list[int, bool]: 
+def acusa(quantidade_vivos: int) -> tuple[bool, int]: 
     '''Função principal responsável por fazer o debate de acusação entre os jogadores.'''
     global jogadores
     players_vivos = lista_jogadores_vivos()
@@ -398,7 +397,7 @@ def acusa(quantidade_vivos: int) -> list[int, bool]:
     else:
         resultado, quantidade_vivos = acusacao_jogadores(quantidade_vivos)
 
-    return [quantidade_vivos, resultado]
+    return (resultado, quantidade_vivos)
 
 
 
