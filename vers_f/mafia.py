@@ -229,9 +229,9 @@ def escolher_jogador_para_proteger() -> int:
         try:
             escolhido = int(input("Digite o número do jogador que você deseja proteger durante a noite: "))
             print("Jogadores vivos: ", lista_jogadores_vivos())
-            if 0 <= escolhido < len(jogadores):
+            if 0 <= escolhido < len(jogadores) and jogadores[escolhido].vida == 1:
                 return escolhido
-            print("Jogador não existe.")
+            print("Jogador não existe ou já morreu.")
         except:
             print("Entrada inválida.")
 
@@ -242,10 +242,9 @@ def processar_escolha_medico(escolhido: int, vitima: int) -> bool:
         jogadores[escolhido].revive()
         return True
     
-#    while jogadores[escolhido].vida == 0:
-#        print("Esse jogador morreu em outra rodada e não pode mais ser salvo. Escolha outro.")
-#        escolher_jogador_para_proteger()
-
+    elif jogadores[escolhido].vida == 0:
+        print("Esse jogador morreu em outra rodada e não pode mais ser salvo. Escolha outro.")
+        
     return False
 
 
